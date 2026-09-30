@@ -57,7 +57,20 @@ Expected result:
 0
 ```
 
+## WooCommerce
 
+This project uses WooCommerce 11.1.2.
+
+WooCommerce is committed to the repository under:
+
+public/wp-content/plugins/woocommerce/
+
+After cloning the repository, start the Docker environment and complete the
+WordPress installation. WooCommerce can then be activated from the WordPress
+admin or with WP-CLI:
+```bash
+./wpcli plugin activate woocommerce
+```
 
 ## WP-CLI
 
