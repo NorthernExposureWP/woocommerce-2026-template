@@ -42,7 +42,12 @@ Add to `public/wp-config.php`:
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 ```
 
-This loads the project-level Composer autoloader before WordPress loads plugins.
+```php
+define( 'WP_CONTENT_DIR', dirname( __DIR__ ) . '/wp-content' ); 
+define( 'WP_CONTENT_URL', 'http://localhost:8080/wp-content' );
+```
+
+This loads the project-level Composer autoloader before WordPress loads plugins and loads plugins from root folder.
 
 
 ## 7. Verify installation
