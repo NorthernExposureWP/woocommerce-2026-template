@@ -29,6 +29,9 @@ RUN a2enmod rewrite
 RUN sed -ri -e 's!/var/www/html!/var/www/html/public!g' \
     /etc/apache2/sites-available/*.conf
 
+COPY docker/php/wp-content.conf /etc/apache2/conf-available/wp-content.conf
+RUN a2enconf wp-content
+
 RUN pecl install xdebug \
     && docker-php-ext-enable xdebug
 
