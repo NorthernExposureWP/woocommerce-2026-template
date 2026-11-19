@@ -5,14 +5,24 @@ services:
       dockerfile: docker/php/Dockerfile
     extra_hosts:
       - "host.docker.internal:host-gateway"
+    environment:
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+      WORDPRESS_ADMIN_USER: ${WORDPRESS_ADMIN_USER:-admin}
+      WORDPRESS_ADMIN_PASSWORD: ${WORDPRESS_ADMIN_PASSWORD:-local-only-change-me}
+      WORDPRESS_ADMIN_EMAIL: ${WORDPRESS_ADMIN_EMAIL:-admin@example.test}
+      WORDPRESS_SITE_URL: ${WORDPRESS_SITE_URL:-http://localhost:8080}
+      WORDPRESS_SITE_TITLE: ${WORDPRESS_SITE_TITLE:-WooCommerce Development Store}
     volumes:
       - .:/var/www/html
       #- wordpress_uploads:/var/www/html/public/wp-content/uploads
       - ./docker/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
     ports:
-      - "8080:8080"
+      - "${WORDPRESS_PORT:-8080}:8080"
     depends_on:
-      - mysql
+      mysql:
+        condition: service_healthy
 
   mysql:
     image: mysql:9
@@ -23,6 +33,12 @@ services:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
     volumes:
       - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping --host=127.0.0.1 --user=root --password=\"$${MYSQL_ROOT_PASSWORD}\" --silent"]
+      interval: 5s
+      timeout: 5s
+      retries: 20
+      start_period: 10s
 
 volumes:
   mysql_data:

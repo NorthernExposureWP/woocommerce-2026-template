@@ -26,60 +26,26 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-### 3. Install Composer dependencies
+On startup, the PHP container waits for MySQL, runs `composer install` if
+`vendor/autoload.php` is missing, creates `public/wp-config.php` if it is
+missing, installs WordPress if the database is not already installed, and
+activates WooCommerce. The generated config contains unique salts and is ignored
+by Git.
 
-```bash
-docker compose exec -e XDEBUG_MODE=off php composer install
-```
+The administrator password in `.env.example` is for **localhost development
+only**. Do not use it on a publicly accessible site or in production. Set a
+different password in `.env` if the site will be reachable by anyone else.
 
-### 4. Install WordPress
-
-Open:
+Open the site at:
 
 ```text
 http://localhost:8080
 ```
 
-Complete the standard WordPress installation in the browser.
+Set `WORDPRESS_PORT` in `.env` to change the host port. Apache continues to
+listen on port 8080 inside the PHP container.
 
-### 5. Fix file ownership
-
-If files inside `public/` were created by the Docker container and are not writable by the host user:
-
-```bash
-sudo chown -R $USER:$USER public/
-```
-
-### 6. Configure WordPress
-
-Add the following to `public/wp-config.php`:
-
-```php
-require_once dirname(__DIR__) . '/vendor/autoload.php';
-
-define('WP_CONTENT_DIR', dirname(__DIR__) . '/wp-content');
-define('WP_CONTENT_URL', 'http://localhost:8080/wp-content');
-```
-
-The project-level Composer autoloader is loaded before WordPress loads plugins.
-
-`WP_CONTENT_DIR` points WordPress to the project-level `wp-content/` directory. The Docker/Apache configuration exposes this directory through `/wp-content/`.
-
-### 7. Activate WooCommerce
-
-WooCommerce 11.1.2 is included in the repository:
-
-```text
-wp-content/plugins/woocommerce/
-```
-
-Activate it with WP-CLI:
-
-```bash
-./wpcli plugin activate woocommerce
-```
-
-### 8. Provision the template
+### 3. Provision the template when desired
 
 Run:
 
@@ -87,7 +53,8 @@ Run:
 ./wpcli template provision
 ```
 
-The provisioning command configures the reusable store baseline:
+The provisioning command configures the reusable store baseline. It is not run
+automatically:
 
 * pretty permalinks;
 * WooCommerce Coming Soon disabled;
@@ -102,6 +69,17 @@ The provisioning command configures the reusable store baseline:
 * removal of the default Sample Page.
 
 The command is safe to run repeatedly.
+
+On subsequent container starts, an existing `wp-config.php` is left untouched,
+WordPress is not installed again, and the administrator account is not reset
+from `.env`. WooCommerce is activated if it is not already active.
+
+Changing the site URL after installation requires updating the saved WordPress
+`home` and `siteurl` options. Changing the MySQL credentials after the database
+volume has been initialized does not migrate that database or update its grants.
+Do not remove the MySQL volume to recover from an initialization error; inspect
+the PHP and MySQL logs and correct the reported configuration or connectivity
+issue first.
 
 After provisioning, the template provides the basic storefront flow:
 
