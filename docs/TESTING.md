@@ -9,6 +9,10 @@ tests/
 ├── Unit/
 └── Integration/
 
+`tests/Unit/` and `tests/Integration/` are prepared locations for future tests.
+They currently contain only `.gitkeep` placeholders; no test cases have been
+added yet.
+
 Add unit tests under `tests/Unit/` and integration tests under
 `tests/Integration/`. PHPUnit registers both directories in the root
 `phpunit.xml`.
