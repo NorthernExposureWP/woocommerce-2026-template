@@ -7,7 +7,7 @@ The project `composer.json` contains PSR-4 mappings for custom plugins, for exam
 ```json
 "autoload": {
     "psr-4": {
-        "Umbrella\\ReadingTime\\": "public/wp-content/plugins/umbrella-reading-time/"
+        "Vendor\\Plugin\\": "wp-content/plugins/plugin-name/"
     }
 }
 ```
@@ -23,7 +23,7 @@ This is required because WP-CLI uses its **own Composer autoloader** inside the 
 Therefore, without the `require_once` above:
 
 ```bash
-./wpcli eval 'var_dump(class_exists(\Umbrella\ReadingTime\ReadingTimeCalculator::class));'
+./wpcli eval 'var_dump(class_exists(\Vendor\Plugin\ExampleClass::class));'
 ```
 
 may return:
@@ -46,7 +46,7 @@ docker compose run --rm \
 Then verify that the project's class can be autoloaded:
 
 ```bash
-./wpcli eval 'var_dump(class_exists(\Umbrella\ReadingTime\ReadingTimeCalculator::class));'
+./wpcli eval 'var_dump(class_exists(\Vendor\Plugin\ExampleClass::class));'
 ```
 
 Expected result:
@@ -65,7 +65,7 @@ require_once __DIR__ . '/vendor/autoload.php';
 
 The plugin relies on the project-level Composer autoloader being loaded by `wp-config.php`.
 
-When adding a new custom `umbrella-*` plugin:
+When adding a new custom plugin:
 
 1. Add its PSR-4 namespace to the root `composer.json`.
 2. Run `composer dump-autoload`.

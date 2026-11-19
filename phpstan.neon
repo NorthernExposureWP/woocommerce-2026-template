@@ -5,8 +5,9 @@ parameters:
     level: 5
 
     paths:
-        - public/wp-content/plugins/umbrella-reading-time
+        - wp-content/plugins
 
     excludePaths:
+        - wp-content/plugins/woocommerce/**
         - vendor
         - tests

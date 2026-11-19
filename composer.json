@@ -1,5 +1,5 @@
 {
-  "name": "dima/wordpress-deep-dive-2026",
+  "name": "wordpress-woocommerce/plugin-project-template",
   "type": "project",
   "require": {
     "php": "^8.4",
