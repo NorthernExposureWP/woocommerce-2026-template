@@ -26,6 +26,10 @@ RUN curl -fsSL https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-
 
 RUN a2enmod rewrite
 
+RUN sed -ri 's/^Listen 80$/Listen 8080/' /etc/apache2/ports.conf \
+    && sed -ri 's/<VirtualHost \*:80>/<VirtualHost *:8080>/' \
+        /etc/apache2/sites-available/*.conf
+
 RUN sed -ri -e 's!/var/www/html!/var/www/html/public!g' \
     /etc/apache2/sites-available/*.conf
 

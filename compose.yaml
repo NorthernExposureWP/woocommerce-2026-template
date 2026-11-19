@@ -10,7 +10,7 @@ services:
       #- wordpress_uploads:/var/www/html/public/wp-content/uploads
       - ./docker/php/xdebug.ini:/usr/local/etc/php/conf.d/xdebug.ini
     ports:
-      - "8080:80"
+      - "8080:8080"
     depends_on:
       - mysql
 

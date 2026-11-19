@@ -2,3 +2,5 @@
 .idea/
 /vendor/
 /public/wp-config.php
+/public/wp-content/
+/wp-content/uploads/
