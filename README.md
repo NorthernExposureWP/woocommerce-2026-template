@@ -2,7 +2,7 @@
 
 Minimal WooCommerce starter template for quickly creating new development stores.
 
-The template contains the Docker environment, WordPress, WooCommerce, Composer setup, and a reproducible provisioning command.
+The template contains the Docker environment, WordPress, WooCommerce, and Composer setup.
 
 Store-specific data such as products, categories, orders, customers, and other test data is intentionally not included.
 
@@ -14,45 +14,57 @@ Store-specific data such as products, categories, orders, customers, and other t
 
 ## Setup
 
-### 1. Create environment file
+### 1. Clone the repository
+
+```bash
+git clone <repository-url>
+cd <repository-directory>
+```
+
+### 2. Create environment file
 
 ```bash
 cp .env.example .env
 ```
 
-### 2. Start Docker
+The example database settings are `MYSQL_DATABASE=woocommerce`,
+`MYSQL_USER=woocommerce`, `MYSQL_PASSWORD=woocommerce`, and
+`MYSQL_ROOT_PASSWORD=root`. `MYSQL_ROOT_PASSWORD` configures the MySQL server's
+root account for MySQL administration; it is not used in the WordPress database
+configuration wizard. WordPress uses `MYSQL_DATABASE`, `MYSQL_USER`, and
+`MYSQL_PASSWORD`, with `mysql` as the database host. If you change the database
+name, user, or password in `.env`, use the matching values in the wizard.
+
+### 3. Start Docker
 
 ```bash
 docker compose up -d --build
 ```
 
-### 3. Install Composer dependencies
+### 4. Install Composer dependencies
 
 ```bash
 docker compose exec -e XDEBUG_MODE=off php composer install
 ```
 
-### 4. Install WordPress
+### 5. Install WordPress
 
-Open:
+Open the site in your browser:
 
 ```text
 http://localhost:8080
 ```
 
-Complete the standard WordPress installation in the browser.
+In the WordPress database configuration wizard, enter the database name, user,
+and password from `.env`. Set the database host to `mysql` and leave the table
+prefix as `wp_` unless you need a different prefix.
 
-### 5. Fix file ownership
+After validating the database connection, WordPress creates
+`public/wp-config.php`. If it cannot write the file, it displays the generated
+configuration for you to save manually as `public/wp-config.php`.
 
-If files inside `public/` were created by the Docker container and are not writable by the host user:
-
-```bash
-sudo chown -R $USER:$USER public/
-```
-
-### 6. Configure WordPress
-
-Add the following to `public/wp-config.php`:
+Before clicking **Run the installation**, add the project Composer autoloader
+and the project content directory settings to `public/wp-config.php`:
 
 ```php
 require_once dirname(__DIR__) . '/vendor/autoload.php';
@@ -61,11 +73,12 @@ define('WP_CONTENT_DIR', dirname(__DIR__) . '/wp-content');
 define('WP_CONTENT_URL', 'http://localhost:8080/wp-content');
 ```
 
-The project-level Composer autoloader is loaded before WordPress loads plugins.
+Then complete the WordPress installation in the browser. The project-level
+`wp-content/` directory is exposed by Docker/Apache at `/wp-content/`.
 
-`WP_CONTENT_DIR` points WordPress to the project-level `wp-content/` directory. The Docker/Apache configuration exposes this directory through `/wp-content/`.
+### 6. Activate WooCommerce
 
-### 7. Activate WooCommerce
+After completing the WordPress installation, activate WooCommerce as the final setup step.
 
 WooCommerce 11.1.2 is included in the repository:
 
@@ -79,43 +92,6 @@ Activate it with WP-CLI:
 ./wpcli plugin activate woocommerce
 ```
 
-### 8. Provision the template
-
-Run:
-
-```bash
-./wpcli template provision
-```
-
-The provisioning command configures the reusable store baseline:
-
-* pretty permalinks;
-* WooCommerce Coming Soon disabled;
-* Home page;
-* Shop page;
-* Cart page;
-* Checkout page;
-* My Account page;
-* WooCommerce page settings;
-* Home as the site front page;
-* primary navigation;
-* removal of the default Sample Page.
-
-The command is safe to run repeatedly.
-
-After provisioning, the template provides the basic storefront flow:
-
-```text
-/                       Home
-/shop/                  Product catalog
-/product/...            Product page
-/product-category/...   Product category
-/cart/                  Cart
-/checkout/              Checkout
-/my-account/            My Account
-/order-received/...     Order confirmation
-```
-
 The template does not create products, categories, customers, orders, or other store-specific data.
 
 ## WP-CLI
@@ -126,14 +102,15 @@ Use the project wrapper:
 ./wpcli core version
 ./wpcli plugin list
 ./wpcli theme list
-./wpcli template provision
 ```
 
 The wrapper uses the project's `wp-cli.yml` configuration.
 
 ## Composer autoload
 
-Custom code uses the project-level Composer autoloader.
+Custom code uses the project-level Composer autoloader configured in
+`public/wp-config.php`. See
+[Project-level Composer Autoloading](docs/ARCHITECTURE.md) for details.
 
 After adding or changing a custom namespace in `composer.json`:
 
@@ -145,7 +122,7 @@ Custom plugins must not contain their own `composer.json` or `vendor/` directory
 
 ## Template architecture
 
-The repository contains infrastructure and reusable configuration only.
+The repository contains infrastructure for a WordPress/WooCommerce development environment.
 
 Committed:
 
@@ -154,16 +131,7 @@ Committed:
 * WooCommerce;
 * Composer configuration;
 * WP-CLI configuration;
-* provisioning code;
 * the default theme.
-
-Provisioned:
-
-* WordPress/WooCommerce pages;
-* WooCommerce page settings;
-* permalink configuration;
-* navigation;
-* other reusable store settings.
 
 Not included:
 
