@@ -63,6 +63,15 @@ After validating the database connection, WordPress creates
 `public/wp-config.php`. If it cannot write the file, it displays the generated
 configuration for you to save manually as `public/wp-config.php`.
 
+If you cannot create `public/wp-config.php` because `public/` is owned by root,
+run this from the repository root to give the directory to your current user:
+
+```bash
+sudo chown "$(id -un):$(id -gn)" public
+```
+
+Then create or save `public/wp-config.php` using your editor.
+
 Before clicking **Run the installation**, add the project Composer autoloader
 and the project content directory settings to `public/wp-config.php`:
 
